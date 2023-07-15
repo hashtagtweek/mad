@@ -35,10 +35,6 @@ resetCounter.setOnClickListener {
 countervalue = 0
 counterValue.text = (countervalue).toString()
 }
-/*fun reset(view : View){
-val count = 0
-var text = count.toString()
-}*/
 
 }
 
