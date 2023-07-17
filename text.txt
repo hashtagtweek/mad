@@ -1,0 +1,30 @@
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.speech.tts.TextToSpeech
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
+import java.util.*
+
+class MainActivity : AppCompatActivity()
+{
+    lateinit var tts : TextToSpeech
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        var e1 = findViewById<EditText>(R.id.edtext)
+        var b1 = findViewById<ImageView>(R.id.clickmic)
+
+        b1.setOnClickListener {
+            tts = TextToSpeech(applicationContext,TextToSpeech.OnInitListener {
+                if (it == TextToSpeech.SUCCESS)
+                {
+                    tts.setSpeechRate(1.0f)
+                    tts.language = Locale.US
+                    tts.speak(e1.text.toString(),TextToSpeech.QUEUE_ADD,null)
+                }
+            })
+        }
+    }
+}
