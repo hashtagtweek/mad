@@ -1,75 +1,48 @@
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.SeekBar
-import java.util.*
+
+class MainActivity : AppCompatActivity()
+{
+    private lateinit var tts : TextToSpeech
+    private lateinit var e1 : EditText
+    private lateinit var b1 : Button
+    private lateinit var pitchbar : SeekBar
+    private lateinit var speedbar : SeekBar
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        e1 = findViewById(R.id.edtext)
+        b1 = findViewById(R.id.texttospeech)
+        pitchbar = findViewById(R.id.setpitch)
+        speedbar = findViewById(R.id.setspeachrate)
+
+        b1.setOnClickListener {
+
+            var pitch = pitchbar.progress.toFloat()/50
+            if (pitch < 0.1) pitch = 0.1f
+
+            var speed = speedbar.progress.toFloat()/50
+            if (speed < 0.1 ) speed = 0.1f
 
 
+            tts = TextToSpeech(applicationContext,TextToSpeech.OnInitListener {
+                if (it == TextToSpeech.SUCCESS)
+                {
+                    tts.setPitch(pitch)
+                    tts.setSpeechRate(speed)
+                    tts.speak(e1.text.toString(),TextToSpeech.QUEUE_ADD,null)
+                }
+            })
 
-class MainActivity : AppCompatActivity() {
-private lateinit var speakBtn:Button
-private lateinit var userText:EditText
-private lateinit var seekBerPitch:SeekBar
-private lateinit var seekBerSpeed:SeekBar
-private lateinit var mTTs :TextToSpeech
-
-
-override fun onCreate(savedInstanceState: Bundle?) {
-super.onCreate(savedInstanceState)
-setContentView(R.layout.activity_main)
-
-
-speakBtn = findViewById(R.id.btnSpeak)
-userText = findViewById(R.id.edTv)
-seekBerPitch = findViewById(R.id.seekBar_pitch)
-seekBerSpeed = findViewById(R.id.seekBar_speed)
-
-mTTs = TextToSpeech(this){status->
-if (status == TextToSpeech.SUCCESS){
-val result = mTTs.setLanguage(Locale.ENGLISH)
-if (result == TextToSpeech.LANG_MISSING_DATA
-|| result == TextToSpeech.LANG_NOT_SUPPORTED){
-Log.e("TTs","Language is not Supported")
-
-
-}else{
-speakBtn.isEnabled = true
+        }
+    }
 }
-}
-else{
-Log.e("TTs","Initialization failed")
-}
-}
-speakBtn.setOnClickListener { speak() }
-}
-
-@Suppress("DEPRECATION")
-private fun speak() {
-val text = userText.text.toString()
-var pitch = seekBerPitch.progress.toFloat()/50
-if (pitch<0.1) pitch = 0.1f
-var speed = seekBerSpeed.progress.toFloat()/50
-if (speed<0.1) speed = 0.1f
-mTTs.setPitch(pitch)
-mTTs.setSpeechRate(speed)
-mTTs.speak(text,TextToSpeech.QUEUE_FLUSH,null)
-
-}
-
-override fun onDestroy() {
-if (mTTs != null){
-
-mTTs.stop()
-mTTs.shutdown()
-}
-super.onDestroy()
-}
-
-}
-
 
 
 Manifest
@@ -102,74 +75,65 @@ android:theme="@style/Theme.TextToSpeech">
 </application>
 </manifest>
 
+xml
 
-  <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:orientation="vertical"
-android:gravity="center"
-tools:context=".MainActivity">
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
 
-<ScrollView
-android:layout_width="match_parent"
-android:layout_height="wrap_content">
-<LinearLayout
-android:orientation="vertical"
-android:layout_width="match_parent"
-android:layout_height="wrap_content">
-<EditText
-android:id="@+id/edTv"
-android:hint="Enter Text"
-android:textSize="19sp"
-android:textStyle="bold"
-android:layout_margin="15dp"
-android:padding="15dp"
+    <EditText
+        android:id="@+id/edtext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="101dp"
+        android:layout_marginTop="84dp"
+        android:layout_marginEnd="101dp"
+        android:ems="10"
+        android:gravity="start|top"
+        android:inputType="textMultiLine"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
-android:textColor="@color/purple_500"
-android:layout_width="match_parent"
-android:layout_height="wrap_content"/>
-<TextView
-android:text="Pitch"
-android:textColor="@color/purple_500"
-android:textStyle="bold"
-android:textSize="18sp"
-android:layout_margin="10dp"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"/>
-<SeekBar
-android:id="@+id/seekBar_pitch"
-android:progress="50"
-android:layout_width="200dp"
-android:layout_height="wrap_content"/>
-<TextView
-android:text="Speed"
-android:textColor="@color/purple_500"
-android:textStyle="bold"
-android:textSize="18sp"
-android:layout_margin="10dp"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"/>
-<SeekBar
-android:id="@+id/seekBar_speed"
-android:progress="50"
-android:layout_width="200dp"
+    <Button
+        android:id="@+id/texttospeech"
+        android:layout_width="192dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="161dp"
+        android:layout_marginEnd="156dp"
+        android:layout_marginBottom="352dp"
+        android:text="TEXT TO SPEECH"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.544"
+        app:layout_constraintStart_toStartOf="parent" />
 
-android:layout_height="wrap_content"/>
-<Button
-android:id="@+id/btnSpeak"
-android:text="Convert text to speech!"
-android:textSize="19sp"
-android:textStyle="bold"
-android:textAllCaps="false"
-android:layout_gravity="center"
-android:layout_margin="20dp"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"/>
+    <SeekBar
+        android:id="@+id/setpitch"
+        android:layout_width="294dp"
+        android:layout_height="34dp"
+        android:layout_marginStart="58dp"
+        android:layout_marginTop="90dp"
+        android:layout_marginEnd="59dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/texttospeech" />
 
-</LinearLayout>
-</ScrollView>
-</LinearLayout>
+    <SeekBar
+        android:id="@+id/setspeachrate"
+        android:layout_width="294dp"
+        android:layout_height="34dp"
+        android:layout_marginStart="58dp"
+        android:layout_marginEnd="59dp"
+        android:layout_marginBottom="136dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
