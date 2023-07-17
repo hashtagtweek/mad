@@ -123,3 +123,5 @@ result.text = ""
 }
 }
 }
+
+paste in  implementation 'net.objecthunter:exp4j:0.4.8'  in app level gradle
